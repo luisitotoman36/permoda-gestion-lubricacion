@@ -5,7 +5,12 @@ import path from 'path';
 
 dotenv.config();
 
-const useSqlite = process.env.USE_SQLITE === 'true' || !process.env.DATABASE_HOST;
+const explicitSqlite = process.env.USE_SQLITE === 'true';
+const explicitPostgres = process.env.USE_SQLITE === 'false';
+const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+const hasDatabaseHost = Boolean(process.env.DATABASE_HOST);
+
+const useSqlite = explicitSqlite || (!explicitPostgres && !hasDatabaseUrl && !hasDatabaseHost);
 
 export const AppDataSource = new DataSource(
   useSqlite
@@ -18,6 +23,7 @@ export const AppDataSource = new DataSource(
       }
     : {
         type: 'postgres',
+        url: process.env.DATABASE_URL || undefined,
         host: process.env.DATABASE_HOST || 'localhost',
         port: Number(process.env.DATABASE_PORT || 5432),
         username: process.env.DATABASE_USER || 'permoda',

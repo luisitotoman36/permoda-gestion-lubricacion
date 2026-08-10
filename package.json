@@ -25,20 +25,24 @@
     "pdfkit": "^0.13.0",
     "pg": "^8.11.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.3.18"
+    "typeorm": "^0.3.18",
+    "uuid": "^11.1.1"
   },
   "optionalDependencies": {
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/cors": "2.8.19",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.2",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/multer": "^1.4.7",
+    "@types/node": "22.20.1",
+    "@types/pdfkit": "0.13.9",
     "@types/supertest": "^2.0.12",
-    "supertest": "^6.4.0",
     "jest": "^29.6.1",
+    "supertest": "^7.2.2",
     "ts-jest": "^29.1.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.4.2"

@@ -33,7 +33,12 @@ export async function login(req: Request, res: Response) {
   const ok = await comparePassword(password, user.password);
   if (!ok) return res.status(401).json({ message: 'Credenciales inválidas' });
   const secret = process.env.JWT_SECRET || 'change_this_strong_secret';
-  const token = jwt.sign({ sub: user.id, email: user.email, role: user.role.name }, secret, { expiresIn: process.env.JWT_EXPIRES_IN || '8h' });
+  const expiresIn = (process.env.JWT_EXPIRES_IN || '8h') as jwt.SignOptions['expiresIn'];
+  const token = jwt.sign(
+    { sub: user.id, email: user.email, role: user.role.name },
+    secret,
+    { expiresIn } as jwt.SignOptions
+  );
   return res.json({ token, user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role.name } });
 }
 
@@ -58,7 +63,7 @@ export async function requestPasswordReset(req: Request, res: Response) {
   const token = uuidv4();
   // Guardar token en campo temporal de password (no ideal) o en otra tabla; aquí devolvemos token para que el cliente lo use con frontend/SMTP configurado
   const secret = process.env.JWT_SECRET || 'change_this_strong_secret';
-  const resetToken = jwt.sign({ sub: user.id, t: token }, secret, { expiresIn: '1h' });
+  const resetToken = jwt.sign({ sub: user.id, t: token }, secret, { expiresIn: '1h' } as jwt.SignOptions);
   return res.json({ resetToken });
 }
 
