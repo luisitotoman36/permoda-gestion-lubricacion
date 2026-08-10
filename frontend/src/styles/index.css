@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+:root {
+	--industrial-blue: #0b3d91;
+	--accent: #f59e0b; /* warm amber accent */
+	--muted: #6b7280;
+	--card-bg: #0b1220; /* deeper card bg */
+	--surface: #0f1724;
+	--glass: rgba(255,255,255,0.04);
+	--glass-2: rgba(255,255,255,0.06);
+}
+
+body { @apply text-white; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: #040617; }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 14% 18%, rgba(79,70,229,0.44), transparent 16%),
+              radial-gradient(circle at 82% 12%, rgba(59,130,246,0.38), transparent 14%),
+              radial-gradient(circle at 52% 72%, rgba(168,85,247,0.22), transparent 24%),
+              linear-gradient(135deg, rgba(8,12,43,1), rgba(18,28,79,0.96) 36%, rgba(14,34,92,0.94));
+  z-index: -2;
+  filter: blur(14px);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle at 36% 16%, rgba(96,165,250,0.18), transparent 18%),
+                    radial-gradient(circle at 68% 80%, rgba(192,132,252,0.16), transparent 24%),
+                    conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,0.04), transparent 60%);
+  opacity: 0.95;
+  z-index: -1;
+}
+
+.bg-login-gradient { background: radial-gradient(circle at top left, rgba(10, 132, 255, 0.22), transparent 18%), radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.18), transparent 20%), linear-gradient(180deg, #020617 0%, #060f2d 100%); }
+
+@keyframes glow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+.app-shell { @apply min-h-screen flex bg-[#080d1f] }
+
+.sidebar { background: linear-gradient(180deg, #071639 0%, #08154b 100%); @apply w-72 p-6 text-white shadow-[0_20px_80px_-40px_rgba(0,0,0,0.5)]; border-right: 1px solid rgba(255,255,255,0.06); }
+.content { @apply flex-1 p-8; background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), transparent 45%), linear-gradient(180deg, #08111f 0%, #0b172a 100%); }
+
+.metric-card { @apply rounded-[24px] p-6 shadow-2xl border border-white/10; background: rgba(15, 23, 42, 0.9); }
+.metric-value { @apply text-4xl font-bold text-white }
+.metric-label { @apply text-sm uppercase tracking-[0.24em] text-slate-400 }
+
+.chart-card { @apply rounded-[28px] p-6 bg-slate-950/80 border border-white/10 shadow-xl; }
+
+.error-card { @apply rounded-[28px] p-6 bg-red-950/20 text-red-100 border border-red-500/20 shadow-lg; }
+
+button.primary-action { @apply rounded-full bg-cyan-500 px-6 py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400; }
+
+input.form-input, select.form-input, textarea.form-input {
+  @apply w-full rounded-2xl border border-white/10 bg-slate-950/95 px-4 py-3 text-white placeholder:text-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20;
+}
+
+label.form-label { @apply block text-sm font-medium text-slate-200 mb-2; }
+
+.table-card {
+  @apply rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-slate-950/95;
+}
+
+.table-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-card th,
+.table-card td {
+  @apply p-3 text-slate-100;
+}
+
+.table-card thead {
+  @apply bg-slate-900/80 text-slate-300 text-sm uppercase tracking-[0.12em];
+}
+
+.table-card tbody tr {
+  border-top: 1px solid rgba(148,163,184,0.12);
+}
+
+.table-card tbody tr:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+button.secondary-action { @apply rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10; }
+
+/* Responsive: hide sidebar on small screens, toggle with .sidebar-open on root */
+@media (max-width: 768px) {
+	.sidebar { position: fixed; left: -320px; top: 0; bottom: 0; width: 280px; z-index: 50; transition: left 220ms ease; }
+	.sidebar.sidebar-open, :root.sidebar-open .sidebar { left: 0; }
+	.content { padding: 4px; }
+}
+
+.kpi-card { @apply p-5 rounded-xl transition-transform transform hover:-translate-y-1; background: linear-gradient(180deg, var(--glass), var(--glass-2)); box-shadow: 0 8px 30px rgba(2,6,23,0.06); border: 1px solid rgba(255,255,255,0.03); }
+.kpi-value { @apply text-3xl font-extrabold text-gray-900 }
+.kpi-label { @apply text-sm text-gray-500 }
+
+.kpi-card .kpi-icon { @apply w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-white/10 }
+
+.card { @apply bg-white rounded-xl shadow p-4 }
+
+.fade-in { @apply animate-fadeIn }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: translateY(0) } }
+.animate-fadeIn { animation: fadeIn 400ms ease-out both }
+
+@keyframes zoom-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+.animate-zoom-in { animation: zoom-in 0.9s ease-out both }
+
+/* Small helpers */
+.muted { color: var(--muted) }
+.accent { color: var(--accent) }
