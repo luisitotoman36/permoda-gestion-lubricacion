@@ -20,7 +20,15 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use((req, _res, next) => {
+  const contentType = req.headers['content-type'] || '';
+  const isJsonLike = req.method !== 'GET' && req.method !== 'DELETE' && contentType.includes('application/json');
+  if (isJsonLike) {
+    console.log(`[HTTP] ${req.method} ${req.originalUrl} content-type=${contentType}`);
+  }
+  next();
+});
+app.use(express.json({ limit: '2mb' }));
 app.use(auditMiddleware);
 const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
 const uploadPath = path.join(__dirname, '..', UPLOAD_DIR);
@@ -34,6 +42,15 @@ app.use('/api/puntos', pointsRoutes);
 app.use('/api/lubricantes', lubricantsRoutes);
 app.use('/api/ordenes', workordersRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+
+app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  if (err && err.type === 'entity.parse.failed') {
+    console.error('[JSON_PARSE] Invalid JSON payload received:', req.method, req.originalUrl, req.headers['content-type']);
+    return res.status(400).json({ message: 'JSON inválido en la petición' });
+  }
+  console.error('[UNHANDLED_ERROR] ', req.method, req.originalUrl, err);
+  return res.status(500).json({ message: 'Error interno del servidor' });
+});
 
 const PORT = process.env.PORT || 4000;
 
