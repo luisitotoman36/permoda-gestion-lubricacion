@@ -19,7 +19,29 @@ import auditMiddleware from './middleware/audit';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// Configurar CORS para múltiples orígenes
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://localhost:4000',
+      process.env.FRONTEND_URL || 'https://permoda-gestion-lubricacion.vercel.app'
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use((req, _res, next) => {
   const contentType = req.headers['content-type'] || '';
   const isJsonLike = req.method !== 'GET' && req.method !== 'DELETE' && contentType.includes('application/json');
