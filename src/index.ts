@@ -110,9 +110,8 @@ async function ensureAdminUser() {
 
 AppDataSource.initialize()
   .then(async () => {
-    if (process.env.NODE_ENV !== 'production') {
-      await ensureAdminUser();
-    }
+    // Asegurar admin user en todos los entornos
+    await ensureAdminUser();
     app.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}`);
     });
