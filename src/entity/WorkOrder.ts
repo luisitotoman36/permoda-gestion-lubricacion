@@ -11,9 +11,9 @@ export class WorkOrder {
   @Column({ unique: true })
   NumeroOT!: string;
 
-  @ManyToOne(() => Asset, { eager: true })
+  @ManyToOne(() => Asset, { eager: true, nullable: true })
   @JoinColumn()
-  AF!: Asset;
+  AF?: Asset | null;
 
   @ManyToOne(() => Point, { eager: true, nullable: true })
   @JoinColumn()
@@ -41,6 +41,42 @@ export class WorkOrder {
   @Column({ type: 'text', nullable: true })
   Fotografias?: string; // path(s)
 
-  @Column({ default: 'Abierta' })
+  @Column({ default: 'Pendiente' })
   Estado!: string;
+
+  @Column({ nullable: true })
+  codigoMaquina?: string;
+
+  @Column({ nullable: true })
+  maquina?: string;
+
+  @Column({ nullable: true })
+  ubicacion?: string;
+
+  @Column({ nullable: true })
+  area?: string;
+
+  @Column({ nullable: true })
+  tipoTrabajo?: string;
+
+  @Column({ nullable: true })
+  prioridad?: string;
+
+  @Column({ nullable: true })
+  responsable?: string;
+
+  @Column({ type: 'text', nullable: true })
+  descripcion?: string;
+
+  @Column({ nullable: true })
+  lubricante?: string;
+
+  @Column({ nullable: true })
+  cantidad?: string;
+
+  @Column({ nullable: true })
+  unidad?: string;
+
+  @Column({ nullable: true })
+  supervisor?: string;
 }

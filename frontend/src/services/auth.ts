@@ -13,6 +13,21 @@ export async function register(data: { email: string; password: string; fullName
   return r.data;
 }
 
+export async function listUsers() {
+  const r = await api.get('/auth/users');
+  return r.data;
+}
+
+export async function toggleUserStatus(id: string) {
+  const r = await api.patch(`/auth/users/${id}/toggle-active`);
+  return r.data;
+}
+
+export async function deleteUser(id: string) {
+  const r = await api.delete(`/auth/users/${id}`);
+  return r.data;
+}
+
 export function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');

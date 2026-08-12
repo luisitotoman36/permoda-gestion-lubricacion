@@ -2,11 +2,15 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { WorkOrder } from '../entity/WorkOrder';
 import { History } from '../entity/History';
+import { User } from '../entity/User';
+import { Asset } from '../entity/Asset';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 
 const repo = () => AppDataSource.getRepository(WorkOrder);
 const historyRepo = () => AppDataSource.getRepository(History);
+const userRepo = () => AppDataSource.getRepository(User);
+const assetRepo = () => AppDataSource.getRepository(Asset);
 
 export async function createWorkOrder(req: Request, res: Response) {
   const data = req.body;
@@ -36,20 +40,37 @@ export async function updateWorkOrder(req: Request, res: Response) {
   if (!item) return res.status(404).json({ message: 'No encontrado' });
   repo().merge(item, req.body);
   await repo().save(item);
-  // si se marca ejecutada con FechaEjecucion y cantidad, registrar en History
-  if (item.FechaEjecucion && (item.CantidadAplicada || item.PulsosAplicados)) {
-    const h = historyRepo().create({
-      Fecha: item.FechaEjecucion,
-      Usuario: (req as any).user?.email || 'sistema',
-      Activo: item.AF,
-      Punto: item.PuntoLubricacion,
-      Lubricante: item.CantidadAplicada ? String(item.CantidadAplicada) : undefined,
-      CantidadAplicada: item.CantidadAplicada,
-      PulsosAplicados: item.PulsosAplicados,
-      Observaciones: item.Observaciones,
-      EvidenciaFotografica: item.Fotografias,
-    });
-    await historyRepo().save(h);
+
+  const hasExecutionInfo = item.FechaEjecucion && (item.CantidadAplicada !== null && item.CantidadAplicada !== undefined || item.PulsosAplicados !== null && item.PulsosAplicados !== undefined);
+
+  if (hasExecutionInfo) {
+    const currentUserId = (req as any).user?.sub;
+    const currentUser = currentUserId ? await userRepo().findOneBy({ id: currentUserId }) : null;
+
+    const assetValue = item.AF && typeof item.AF !== 'string'
+      ? item.AF
+      : item.AF && typeof item.AF === 'string'
+        ? await assetRepo().findOneBy({ id: item.AF })
+        : null;
+
+    const pointValue = item.PuntoLubricacion && typeof item.PuntoLubricacion !== 'string'
+      ? item.PuntoLubricacion
+      : null;
+
+    if (currentUser && assetValue) {
+      const h = historyRepo().create({
+        Fecha: item.FechaEjecucion,
+        Usuario: currentUser,
+        Activo: assetValue,
+        Punto: pointValue || undefined,
+        Lubricante: item.CantidadAplicada !== undefined && item.CantidadAplicada !== null ? String(item.CantidadAplicada) : undefined,
+        CantidadAplicada: item.CantidadAplicada,
+        PulsosAplicados: item.PulsosAplicados,
+        Observaciones: item.Observaciones,
+        EvidenciaFotografica: item.Fotografias,
+      });
+      await historyRepo().save(h);
+    }
   }
   return res.json(item);
 }

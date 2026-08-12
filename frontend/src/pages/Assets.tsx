@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import api from '../services/api'
+import { getUser } from '../services/auth'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 type Asset = {
   id: string; AF: string; NombreEquipo: string; TipoEquipo: string; Area: string; Estado: string; Criticidad: string; Observaciones?: string
@@ -11,10 +13,26 @@ export default function Assets(){
   const [q, setQ] = useState('')
   const [showNew, setShowNew] = useState(false)
   const [newAsset, setNewAsset] = useState<any>({ AF: '', NombreEquipo: '', TipoEquipo: '', Area: '' })
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const isAdmin = getUser()?.role === 'Administrador'
 
   async function load(){
     const r = await api.get('/activos', { params: { q }})
     setItems(r.data)
+  }
+
+  async function handleDelete(id: string) {
+    setPendingDeleteId(id)
+    setConfirmOpen(true)
+  }
+
+  async function confirmDelete() {
+    if (!pendingDeleteId) return
+    await api.delete(`/activos/${pendingDeleteId}`)
+    setConfirmOpen(false)
+    setPendingDeleteId(null)
+    await load()
   }
 
   useEffect(()=>{ load() }, [])
@@ -58,6 +76,13 @@ export default function Assets(){
                   <td>{i.Area}</td>
                   <td>{i.Estado}</td>
                   <td>{i.Criticidad}</td>
+                  <td>
+                    {isAdmin && (
+                      <button onClick={() => handleDelete(i.id)} className="danger-action">
+                        Eliminar
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -82,6 +107,18 @@ export default function Assets(){
             </div>
           </div>
         )}
+
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Eliminar activo"
+          message="¿Seguro que quieres eliminar este activo?"
+          confirmLabel="Eliminar"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setConfirmOpen(false)
+            setPendingDeleteId(null)
+          }}
+        />
       </main>
     </div>
   )

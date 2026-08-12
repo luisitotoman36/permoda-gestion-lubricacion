@@ -1,16 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
-import { listLubricants, createLubricant } from '../services/lubricants'
+import { listLubricants, createLubricant, deleteLubricant } from '../services/lubricants'
+import { getUser } from '../services/auth'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 export default function Lubricants(){
   const [items, setItems] = useState<any[]>([])
   const [showNew, setShowNew] = useState(false)
   const [newLub, setNewLub] = useState({ Codigo: '', Nombre: '', Referencia: '', Tipo: '' })
   const [error, setError] = useState('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const isAdmin = getUser()?.role === 'Administrador'
 
   async function load(){
     const r = await listLubricants()
     setItems(r)
+  }
+
+  async function handleDelete(id: string) {
+    setPendingDeleteId(id)
+    setConfirmOpen(true)
+  }
+
+  async function confirmDelete() {
+    if (!pendingDeleteId) return
+    await deleteLubricant(pendingDeleteId)
+    setConfirmOpen(false)
+    setPendingDeleteId(null)
+    await load()
   }
 
   useEffect(() => { load() }, [])
@@ -62,6 +80,13 @@ export default function Lubricants(){
                   <td>{i.Nombre}</td>
                   <td>{i.Referencia || i.Marca}</td>
                   <td>{i.Tipo}</td>
+                  <td>
+                    {isAdmin && (
+                      <button onClick={() => handleDelete(i.id)} className="danger-action">
+                        Eliminar
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -124,6 +149,18 @@ export default function Lubricants(){
             </div>
           </div>
         )}
+
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Eliminar lubricante"
+          message="¿Seguro que quieres eliminar este lubricante?"
+          confirmLabel="Eliminar"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setConfirmOpen(false)
+            setPendingDeleteId(null)
+          }}
+        />
       </main>
     </div>
   )

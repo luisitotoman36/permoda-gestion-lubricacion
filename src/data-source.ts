@@ -31,6 +31,7 @@ export const AppDataSource = new DataSource(
         database: process.env.DATABASE_NAME || 'permoda_db',
         synchronize: true,
         logging: false,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
         entities: [__dirname + '/entity/*.{ts,js}'],
       }
 );

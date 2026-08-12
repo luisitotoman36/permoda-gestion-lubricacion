@@ -9,6 +9,46 @@ import { v4 as uuidv4 } from 'uuid';
 const userRepo = () => AppDataSource.getRepository(User);
 const roleRepo = () => AppDataSource.getRepository(Role);
 
+export async function listUsers(req: Request, res: Response) {
+  const users = await userRepo().find({ relations: ['role'], order: { fullName: 'ASC' } });
+  return res.json(users.map(user => ({
+    id: user.id,
+    email: user.email,
+    fullName: user.fullName,
+    role: user.role?.name || 'Sin rol',
+    active: user.active
+  })));
+}
+
+export async function toggleUserStatus(req: Request, res: Response) {
+  const { id } = req.params;
+  const currentUser = (req as any).user;
+  const user = await userRepo().findOne({ where: { id }, relations: ['role'] });
+  if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+  if (user.id === currentUser?.sub) return res.status(400).json({ message: 'No puedes bloquear tu propio usuario' });
+
+  user.active = !user.active;
+  await userRepo().save(user);
+
+  return res.json({
+    id: user.id,
+    active: user.active,
+    fullName: user.fullName,
+    role: user.role?.name || 'Sin rol'
+  });
+}
+
+export async function deleteUser(req: Request, res: Response) {
+  const { id } = req.params;
+  const currentUser = (req as any).user;
+  const user = await userRepo().findOneBy({ id });
+  if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+  if (user.id === currentUser?.sub) return res.status(400).json({ message: 'No puedes eliminar tu propio usuario' });
+
+  await userRepo().delete(id);
+  return res.json({ message: 'Usuario eliminado' });
+}
+
 export async function register(req: Request, res: Response) {
   const { email, password, fullName, roleName } = req.body;
   if (!email || !password || !fullName) return res.status(400).json({ message: 'Campos requeridos' });
@@ -28,8 +68,9 @@ export async function register(req: Request, res: Response) {
 export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ message: 'Credenciales requeridas' });
-  const user = await userRepo().findOne({ where: { email } });
+  const user = await userRepo().findOne({ where: { email }, relations: ['role'] });
   if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
+  if (!user.active) return res.status(401).json({ message: 'Usuario bloqueado' });
   const ok = await comparePassword(password, user.password);
   if (!ok) return res.status(401).json({ message: 'Credenciales inválidas' });
   const secret = process.env.JWT_SECRET || 'change_this_strong_secret';

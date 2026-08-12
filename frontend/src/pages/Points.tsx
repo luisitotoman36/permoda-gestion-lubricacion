@@ -1,16 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
-import { listPoints, createPoint } from '../services/points'
+import { listPoints, createPoint, deletePoint } from '../services/points'
+import { getUser } from '../services/auth'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 export default function Points(){
   const [items, setItems] = useState<any[]>([])
   const [showNew, setShowNew] = useState(false)
   const [newPoint, setNewPoint] = useState({ AF: '', Maquina: '', Componente: '', Lubricante: '', Rodamiento: '', CantidadGramos: '' })
   const [error, setError] = useState('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const isAdmin = getUser()?.role === 'Administrador'
 
   async function load(){
     const r = await listPoints()
     setItems(r)
+  }
+
+  async function handleDelete(id: string) {
+    setPendingDeleteId(id)
+    setConfirmOpen(true)
+  }
+
+  async function confirmDelete() {
+    if (!pendingDeleteId) return
+    await deletePoint(pendingDeleteId)
+    setConfirmOpen(false)
+    setPendingDeleteId(null)
+    await load()
   }
   useEffect(()=>{ load() }, [])
 
@@ -70,6 +88,13 @@ export default function Points(){
                   <td className="p-2">{i.Lubricante}</td>
                   <td className="p-2">{i.Rodamiento}</td>
                   <td className="p-2">{i.CantidadGramos}</td>
+                  <td className="p-2">
+                    {isAdmin && (
+                      <button onClick={() => handleDelete(i.id)} className="danger-action">
+                        Eliminar
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -152,6 +177,18 @@ export default function Points(){
             </div>
           </div>
         )}
+
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Eliminar punto"
+          message="¿Seguro que quieres eliminar este punto de lubricación?"
+          confirmLabel="Eliminar"
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setConfirmOpen(false)
+            setPendingDeleteId(null)
+          }}
+        />
       </main>
     </div>
   )
