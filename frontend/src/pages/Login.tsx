@@ -35,45 +35,45 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-login-gradient text-white px-3 md:px-4">
-      <div className="relative w-full max-w-sm">
-        <div className="overflow-visible rounded-2xl md:rounded-[36px] border border-white/10 bg-slate-950/90 p-6 md:p-8 pt-20 md:pt-24 shadow-[0_40px_100px_-60px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+    <div className="min-h-screen flex items-center justify-center bg-login-gradient text-white px-3">
+      <div className="relative w-full max-w-xs">
+        <div className="overflow-visible rounded-2xl border border-white/10 bg-slate-950/90 p-6 pt-20 shadow-[0_40px_100px_-60px_rgba(0,0,0,0.8)] backdrop-blur-xl">
           <div className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2">
-            <div className="flex h-24 md:h-32 w-24 md:w-32 items-center justify-center rounded-full bg-slate-900/60 ring-2 ring-cyan-400/30 shadow-lg shadow-cyan-500/20 animate-zoom-in">
-              <img src={logo} alt="PERMODA" className="h-16 md:h-24 w-16 md:w-24" />
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-900/60 ring-2 ring-cyan-400/30 shadow-lg shadow-cyan-500/20 animate-zoom-in">
+              <img src={logo} alt="PERMODA" className="h-16 w-16" />
             </div>
           </div>
-          <h1 className="text-center text-2xl md:text-3xl font-bold tracking-[0.18em] mb-6 text-cyan-200">PERMODA</h1>
-          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+          <h1 className="text-center text-2xl font-bold tracking-[0.18em] mb-6 text-cyan-200">PERMODA</h1>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs md:text-sm text-slate-200 mb-2">Email</label>
-              <div className="relative rounded-lg md:rounded-xl bg-slate-950/20 border border-white/10 p-2">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">📧</span>
+              <label className="block text-xs text-slate-200 mb-2">Email</label>
+              <div className="relative rounded-lg bg-slate-950/20 border border-white/10 p-2">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">📧</span>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-transparent pl-10 text-sm md:text-base text-white placeholder:text-slate-500 outline-none"
+                  className="w-full bg-transparent pl-9 text-sm text-white placeholder:text-slate-500 outline-none"
                   placeholder="admin@permoda.local"
                   required
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs md:text-sm text-slate-200 mb-2">Contraseña</label>
-              <div className="relative rounded-lg md:rounded-xl bg-slate-950/20 border border-white/10 p-2">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔒</span>
+              <label className="block text-xs text-slate-200 mb-2">Contraseña</label>
+              <div className="relative rounded-lg bg-slate-950/20 border border-white/10 p-2">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔒</span>
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-transparent pl-10 text-sm md:text-base text-white placeholder:text-slate-500 outline-none"
+                  className="w-full bg-transparent pl-9 text-sm text-white placeholder:text-slate-500 outline-none"
                   placeholder="Contraseña"
                   required
                 />
               </div>
             </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-0 text-xs md:text-sm text-slate-300">
+            <div className="flex items-center justify-between gap-2 text-xs text-slate-300">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -83,10 +83,10 @@ export default function Login() {
                 />
                 Recordarme
               </label>
-              <Link to="/forgot-password" className="text-slate-200 hover:text-white">Restablecer contraseña</Link>
+              <Link to="/forgot-password" className="text-slate-200 hover:text-white">Reset</Link>
             </div>
-            {error && <div className="rounded-lg md:rounded-xl bg-red-500/15 p-3 text-xs md:text-sm text-red-200">{error}</div>}
-            <button type="submit" className="w-full rounded-xl md:rounded-2xl bg-blue-600 px-4 py-2.5 md:py-3 text-sm md:text-base font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500">
+            {error && <div className="rounded-lg bg-red-500/15 p-2 text-xs text-red-200">{error}</div>}
+            <button type="submit" className="w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500">
               Entrar
             </button>
           </form>
